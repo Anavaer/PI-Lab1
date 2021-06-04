@@ -1,0 +1,34 @@
+﻿@model MVC_Lab.Models.NewEntryModels
+
+@{
+    ViewBag.Title = "Create new entry";
+}
+<h2>@ViewBag.Title.</h2>
+
+@using (Html.BeginForm("CreateEntry", "Registry", FormMethod.Post, htmlAttributes: new { @class = "create-entry__form" }))
+{
+    <label>Name</label>
+    @Html.TextBoxFor(model => model.Name, new { @required = "required" })
+
+    <label>Surname</label>
+    @Html.TextBoxFor(model => model.Surname, new { @required = "required" })
+
+    <label>Photo URL</label>
+    @Html.TextBoxFor(model => model.PhotoUrl, new { @required = "required" })
+
+    <label>Age</label>
+    @Html.TextBoxFor(model => model.Age, new { @required = "required" })
+
+    <label>Gender</label>
+    @Html.DropDownListFor(model => model.Gender, new List<SelectListItem>
+        {
+            new SelectListItem{Text="Male", Value="M"},
+            new SelectListItem{Text="Female", Value="F"}
+        }
+        , "Please select", new { @required = "required" })
+
+    <label>City</label>
+    @Html.TextBoxFor(model => model.City, new { @required = "required" })
+
+    <input type="submit" value="Create" />
+}

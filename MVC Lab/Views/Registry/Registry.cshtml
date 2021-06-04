@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Missing People Registry";
+}
+<h2>@ViewBag.Title.</h2>
+
+<nav>
+    @if (User.IsInRole("Admin") || User.IsInRole("User"))
+    {
+        @Html.ActionLink("Create New Entry", "Create", "Registry")
+    }
+    <div>
+        <label for="genderFilter">Gender</label>
+        <select id="genderFilter">
+            <option value="M" selected="selected">Male</option>
+            <option value="F">Female</option>
+        </select>
+        <button>Apply Filters</button>
+    </div>
+</nav>
