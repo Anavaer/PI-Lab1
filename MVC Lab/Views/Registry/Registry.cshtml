@@ -1,19 +1,67 @@
-﻿@{
+﻿@model IEnumerable<MVC_Lab.Models.NewEntryModels>
+
+@{
     ViewBag.Title = "Missing People Registry";
 }
 <h2>@ViewBag.Title.</h2>
 
-<nav>
-    @if (User.IsInRole("Admin") || User.IsInRole("User"))
-    {
+<link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+
+<nav class="registry__navigation">
+    @using (Html.BeginForm("Registry", "Registry", FormMethod.Post)) {
+    <label for="genderFilter">Gender</label>
+    @Html.DropDownList(
+        "genderFilter",
+        new SelectList(new List<string>() { "Male", "Female" }),
+        "Select Gender"
+    )
+    <input type="submit" value="Apply Filters" />
+    }
+
+    @if (User.IsInRole("Admin") || User.IsInRole("User")) {
         @Html.ActionLink("Create New Entry", "Create", "Registry")
     }
-    <div>
-        <label for="genderFilter">Gender</label>
-        <select id="genderFilter">
-            <option value="M" selected="selected">Male</option>
-            <option value="F">Female</option>
-        </select>
-        <button>Apply Filters</button>
-    </div>
 </nav>
+
+<table class="table registry__table">
+    <tr>
+        <th class="th-list">Photo</th>
+        <th class="th-list">Name</th>
+        <th class="th-list">Surname</th>
+        <th class="th-list">Gender</th>
+        <th class="th-list">Age</th>
+        <th class="th-list">City</th>
+        <th></th>
+    </tr>
+
+    @foreach (var person in Model) {
+    <tr>
+        <td><img src="@Url.Content(person.PhotoUrl)" class="registry__thumbnail" /></td>
+        <td>@Html.DisplayFor(modelItem => person.Name)</td>
+        <td>@Html.DisplayFor(modelItem => person.Surname)</td>
+        <td>@(person.Gender == "M" ? "Male" : "Female")</td>
+        <td>@Html.DisplayFor(modelItem => person.Age)</td>
+        <td>@Html.DisplayFor(modelItem => person.City)</td>
+        <td>
+            @if (User.IsInRole("Admin"))
+            {
+
+                @Html.ActionLink(
+                    " ", "Edit", "Registry",
+                    new { id = person.Id },
+                    new { @class = "glyphicon glyphicon-edit" }
+                )
+
+                @Html.ActionLink(
+                    " ", "Delete", "Registry",
+                    new { id = person.Id },
+                    new {
+                        onclick = "return confirm('Are you sure you want to delete the record')",
+                        @class = "glyphicon glyphicon-trash"
+                    }
+                )
+            }
+        </td>
+    </tr>
+    }
+</table>

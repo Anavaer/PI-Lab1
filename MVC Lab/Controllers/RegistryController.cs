@@ -11,28 +11,23 @@ namespace MVC_Lab.Controllers
     {
         private readonly ApplicationDbContext dataBase = ApplicationDbContext.Create();
 
-        // GET: Registry
-        public ActionResult Registry(string gender = "M")
-        {
+        public ActionResult Registry(string genderFilter = "Male") {
             var missingPeople = dataBase.MissingPeople.AsQueryable().Where(
-                person => person.Gender == gender
+                person => person.Gender == (genderFilter == "Male" ? "M" : "F")
             );
         
             return View(missingPeople.ToList());
         }
 
         [Authorize(Roles = "Admin, User")]
-        public ActionResult Create()
-        {
+        public ActionResult Create() {
             return View();
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin, User")]
-        public ActionResult CreateEntry(NewEntryModels data)
-        {
-            try
-            {
+        public ActionResult CreateEntry(NewEntryModels data) {
+            try {
                 var missingPersonEntry = new NewEntryModels()
                 {
                     Name = data.Name,
@@ -47,10 +42,52 @@ namespace MVC_Lab.Controllers
                 dataBase.SaveChanges();
 
                 return RedirectToAction("Registry");
-            }
-            catch
-            {
+            } catch {
                 return View("Create");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult Edit(int id) {
+            var missingPerson = dataBase.MissingPeople
+                .Where(person => person.Id == id).FirstOrDefault();
+
+            return View(missingPerson);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public ActionResult EditEntry(int id, NewEntryModels data) {
+            try {
+                var personToEdit = dataBase.MissingPeople
+                    .Where(p => p.Id == id).FirstOrDefault();
+
+                personToEdit.Name = data.Name;
+                personToEdit.Surname = data.Surname;
+                personToEdit.Gender = data.Gender;
+                personToEdit.Age = data.Age;
+                personToEdit.City = data.City;
+                personToEdit.PhotoUrl = data.PhotoUrl;
+
+                dataBase.SaveChanges();
+
+                return RedirectToAction("Registry");
+            } catch {
+                return View("Registry");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult Delete(int id) {
+            try {
+                var missingPerson = dataBase.MissingPeople
+                    .Where(person => person.Id == id).FirstOrDefault();
+
+                dataBase.MissingPeople.Remove(missingPerson);
+                dataBase.SaveChanges();
+                return RedirectToAction("Registry");
+            } catch {
+                return View("Registry");
             }
         }
     }
